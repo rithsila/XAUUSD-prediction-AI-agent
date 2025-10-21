@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1760939435811,
+      "tag": "0000_stale_ravenous",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1760940322887,
+      "tag": "0001_large_corsair",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1760951756159,
+      "tag": "0002_rainy_nekra",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1760954803492,
+      "tag": "0003_dusty_satana",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1761042786836,
+      "tag": "0004_sparkling_beast",
+      "breakpoints": true
+    }
+  ]
+}
