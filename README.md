@@ -51,7 +51,7 @@ A production-grade AI agent delivering real-time analysis and predictions for XA
 - Test connection workflow to validate Telegram setup
 
 **Secure Authentication**
-- OAuth sign-in via Manus Auth portal
+- Dev login via local route (no external OAuth)
 - Session cookies with automatic redirect on unauthorized API responses
 
 ---
@@ -133,18 +133,23 @@ See [API_KEYS.md](./API_KEYS.md) for integration guides, code examples, and secu
    JWT_SECRET=your-secret-key
    OWNER_OPEN_ID=your-admin-open-id # optional, used for admin features
    
-   # OAuth (Manus Auth)
-   OAUTH_SERVER_URL=https://api.manus.im
-   VITE_OAUTH_PORTAL_URL=https://oauth.manus.im
-   VITE_APP_ID=your-app-id
+   # Development login (no external OAuth)
+   DEV_LOGIN_ENABLED=true
+   VITE_DEV_LOGIN_ENABLED=true
    
    # Branding (optional)
    VITE_APP_TITLE="XAUUSD Prediction Agent"
    VITE_APP_LOGO="https://your-cdn/logo.png"
    
-   # Manus Forge API override (optional)
-   BUILT_IN_FORGE_API_URL=https://forge.manus.im
-   BUILT_IN_FORGE_API_KEY=forge-key
+   # Storage (S3)
+   AWS_S3_BUCKET=your-s3-bucket-name
+   AWS_REGION=your-aws-region
+   # AWS_ACCESS_KEY_ID=your-access-key-id
+   # AWS_SECRET_ACCESS_KEY=your-secret-access-key
+   
+   # Notifications (Telegram; optional)
+   TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+   TELEGRAM_CHAT_ID=your-chat-id
    ```
    
    Notes:

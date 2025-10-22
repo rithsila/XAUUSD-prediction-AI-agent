@@ -9,9 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Bell, Newspaper, Play, Loader2 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Settings() {
-  const { data: settings, isLoading, refetch } = trpc.automation.getSettings.useQuery();
+  const { data: settings, isLoading, isError, error, refetch } = trpc.automation.getSettings.useQuery(undefined, {
+    retry: false,
+  });
   const updateSettings = trpc.automation.updateSettings.useMutation();
   const testTelegram = trpc.automation.testTelegram.useMutation();
   const scrapeNews = trpc.automation.scrapeNews.useMutation();
@@ -20,9 +23,44 @@ export default function Settings() {
   const [telegramBotToken, setTelegramBotToken] = useState("");
   const [telegramChannelId, setTelegramChannelId] = useState("");
 
-  if (isLoading || !settings) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    const errorMessage =
+      error && typeof error === "object" && "message" in (error as any)
+        ? String((error as any).message)
+        : "Network error";
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-lg w-full space-y-4">
+          <Alert variant="destructive">
+            <AlertTitle>Failed to load settings</AlertTitle>
+            <AlertDescription>
+              <p className="mb-2">{errorMessage}</p>
+              <ul className="list-disc pl-5 space-y-1 text-sm">
+                <li>Make sure the backend server is running at <code className="font-mono">http://localhost:3000</code>.</li>
+                <li>If you are viewing the app on <code className="font-mono">http://localhost:5173</code>, enable a proxy to <code className="font-mono">/api</code> or open it via <code className="font-mono">http://localhost:3000</code>.</li>
+                <li>You can also try the dev login at <code className="font-mono">/api/auth/dev-login</code> if authentication is required.</li>
+              </ul>
+            </AlertDescription>
+          </Alert>
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={() => refetch()} className="focus-ring">Retry</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!settings) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -102,7 +140,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <AppHeader />
 
       <div className="container py-6">
@@ -255,63 +293,60 @@ export default function Settings() {
                 <div className="space-y-2">
                   <Label>Bot Token</Label>
                   <Input
-                    type="password"
-                    value={telegramBotToken || settings.telegramBotToken || ""}
+                    type="text"
+                    value={telegramBotToken}
                     onChange={(e) => setTelegramBotToken(e.target.value)}
-                    placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
+                    placeholder={settings.telegramBotToken || "Enter Bot Token"}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Get your bot token from @BotFather on Telegram
-                  </p>
                 </div>
 
                 <div className="space-y-2">
                   <Label>Channel ID</Label>
                   <Input
-                    value={telegramChannelId || settings.telegramChannelId || ""}
+                    type="text"
+                    value={telegramChannelId}
                     onChange={(e) => setTelegramChannelId(e.target.value)}
-                    placeholder="@your_channel or -1001234567890"
+                    placeholder={settings.telegramChannelId || "Enter Channel ID"}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Your channel username or numeric ID
-                  </p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Alert on Prediction</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Send alerts when a prediction is generated
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settings.telegramAlertOnPrediction ?? true}
+                    onCheckedChange={(checked) =>
+                      handleSaveAutomation({ telegramAlertOnPrediction: checked })
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Alert on News</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Send alerts for high-impact news items
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settings.telegramAlertOnNews ?? false}
+                    onCheckedChange={(checked) =>
+                      handleSaveAutomation({ telegramAlertOnNews: checked })
+                    }
+                  />
                 </div>
 
                 <div className="flex gap-2">
-                  <Button onClick={handleSaveTelegram} disabled={updateSettings.isPending}>
-                    {updateSettings.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <Button onClick={handleSaveTelegram} className="focus-ring">
                     Save Telegram Settings
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleTestTelegram}
-                    disabled={testTelegram.isPending}
-                  >
-                    {testTelegram.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <Button variant="outline" onClick={handleTestTelegram} className="focus-ring">
                     Test Connection
                   </Button>
-                </div>
-
-                <div className="space-y-2 pt-4 border-t">
-                  <div className="flex items-center justify-between">
-                    <Label>Alert on New Predictions</Label>
-                    <Switch
-                      checked={settings.telegramAlertOnPrediction ?? true}
-                      onCheckedChange={(checked) =>
-                        handleSaveAutomation({ telegramAlertOnPrediction: checked })
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <Label>Alert on High-Impact News</Label>
-                    <Switch
-                      checked={settings.telegramAlertOnNews ?? false}
-                      onCheckedChange={(checked) =>
-                        handleSaveAutomation({ telegramAlertOnNews: checked })
-                      }
-                    />
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -322,37 +357,25 @@ export default function Settings() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Play className="h-5 w-5" />
-                  Manual Triggers
+                  <Newspaper className="h-5 w-5" />
+                  Manual News Scraping
                 </CardTitle>
                 <CardDescription>
-                  Manually trigger scraping and analysis tasks
+                  Trigger news scraping and set articles for analysis
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Scrape News Now</Label>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Immediately scrape news from all enabled sources
-                  </p>
-                  <Button onClick={handleScrapeNews} disabled={scrapeNews.isPending}>
-                    {scrapeNews.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    <Newspaper className="mr-2 h-4 w-4" />
-                    Scrape News
+                <div className="flex gap-2">
+                  <Button onClick={handleScrapeNews} className="focus-ring">
+                    Scrape News Now
+                  </Button>
+                  <Button onClick={handleRunAnalysis} variant="outline" className="focus-ring">
+                    <Play className="mr-2 h-4 w-4" /> Run Analysis
                   </Button>
                 </div>
-
-                <div className="space-y-2">
-                  <Label>Run Analysis Now</Label>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Analyze unprocessed articles and generate predictions
-                  </p>
-                  <Button onClick={handleRunAnalysis} disabled={runAnalysis.isPending}>
-                    {runAnalysis.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    <Play className="mr-2 h-4 w-4" />
-                    Run Analysis
-                  </Button>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  These actions will run immediately without waiting for the configured intervals
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

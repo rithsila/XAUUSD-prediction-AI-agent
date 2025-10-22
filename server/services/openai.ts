@@ -1,9 +1,14 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  baseURL: "https://api.openai.com/v1",
-});
+export function getOpenAI(): OpenAI {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "OPENAI_API_KEY is not set. Set it in your environment to use AI features."
+    );
+  }
+  return new OpenAI({ apiKey, baseURL: "https://api.openai.com/v1" });
+}
 
 export interface PredictionRequest {
   symbol: string;
@@ -59,13 +64,21 @@ Your task is to provide actionable trading predictions with clear rationale.`;
   const userPrompt = `Analyze XAUUSD for ${request.horizon} timeframe:
 
 Market Context:
-${request.marketContext ? `- Current Price: ${request.marketContext.currentPrice}
+${
+  request.marketContext
+    ? `- Current Price: ${request.marketContext.currentPrice}
 - DXY: ${request.marketContext.dxy}
-- US10Y Yields: ${request.marketContext.yields}` : "- No market data provided"}
+- US10Y Yields: ${request.marketContext.yields}`
+    : "- No market data provided"
+}
 
 Technical Context:
-${request.technicalContext ? `- ADX: ${request.technicalContext.adx} (${request.technicalContext.regime} regime)
-- ATR: ${request.technicalContext.atr}` : "- No technical data provided"}
+${
+  request.technicalContext
+    ? `- ADX: ${request.technicalContext.adx} (${request.technicalContext.regime} regime)
+- ATR: ${request.technicalContext.atr}`
+    : "- No technical data provided"
+}
 
 Recent News:
 ${request.newsContext && request.newsContext.length > 0 ? request.newsContext.join("\n") : "- No recent news"}
@@ -88,6 +101,7 @@ Consider:
 4. Rationale: Top 3-5 key drivers (be specific and concise)`;
 
   try {
+    const openai = getOpenAI();
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -154,6 +168,7 @@ Consider:
 - Topic: Primary category`;
 
   try {
+    const openai = getOpenAI();
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -179,7 +194,9 @@ Consider:
     if (sentiment.score < 0 || sentiment.score > 100) {
       throw new Error("Invalid score value");
     }
-    if (!["policy", "inflation", "geopolitics", "other"].includes(sentiment.topic)) {
+    if (
+      !["policy", "inflation", "geopolitics", "other"].includes(sentiment.topic)
+    ) {
       throw new Error("Invalid topic");
     }
 
@@ -189,4 +206,3 @@ Consider:
     throw error;
   }
 }
-

@@ -1,10 +1,9 @@
 /**
- * Quick example (matches curl usage):
- *   await callDataApi("Youtube/search", {
- *     query: { gl: "US", hl: "en", q: "manus" },
- *   })
+ * Simple data API helper (disabled by default)
+ *
+ * To enable, set DATA_API_BASE_URL and DATA_API_KEY in your environment and
+ * implement your own backend endpoint contract.
  */
-import { ENV } from "./env";
 
 export type DataApiCallOptions = {
   query?: Record<string, unknown>;
@@ -15,50 +14,18 @@ export type DataApiCallOptions = {
 
 export async function callDataApi(
   apiId: string,
-  options: DataApiCallOptions = {}
+  _options: DataApiCallOptions = {}
 ): Promise<unknown> {
-  if (!ENV.forgeApiUrl) {
-    throw new Error("BUILT_IN_FORGE_API_URL is not configured");
-  }
-  if (!ENV.forgeApiKey) {
-    throw new Error("BUILT_IN_FORGE_API_KEY is not configured");
-  }
+  const baseUrl = process.env.DATA_API_BASE_URL;
+  const apiKey = process.env.DATA_API_KEY;
 
-  // Build the full URL by appending the service path to the base URL
-  const baseUrl = ENV.forgeApiUrl.endsWith("/") ? ENV.forgeApiUrl : `${ENV.forgeApiUrl}/`;
-  const fullUrl = new URL("webdevtoken.v1.WebDevService/CallApi", baseUrl).toString();
-
-  const response = await fetch(fullUrl, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "connect-protocol-version": "1",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
-    },
-    body: JSON.stringify({
-      apiId,
-      query: options.query,
-      body: options.body,
-      path_params: options.pathParams,
-      multipart_form_data: options.formData,
-    }),
-  });
-
-  if (!response.ok) {
-    const detail = await response.text().catch(() => "");
+  if (!baseUrl || !apiKey) {
     throw new Error(
-      `Data API request failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`
+      "Data API is not configured. Set DATA_API_BASE_URL and DATA_API_KEY to enable."
     );
   }
 
-  const payload = await response.json().catch(() => ({}));
-  if (payload && typeof payload === "object" && "jsonData" in payload) {
-    try {
-      return JSON.parse((payload as Record<string, string>).jsonData ?? "{}");
-    } catch {
-      return (payload as Record<string, unknown>).jsonData;
-    }
-  }
-  return payload;
+  // Placeholder: implement your own API contract as needed.
+  // Example: POST to `${baseUrl}/call` with { apiId, ...options }
+  throw new Error("callDataApi is not implemented for the provided backend.");
 }

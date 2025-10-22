@@ -1,5 +1,11 @@
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface SentimentBarProps {
   symbol: string;
@@ -9,7 +15,13 @@ interface SentimentBarProps {
   lastUpdate?: Date;
 }
 
-export function SentimentBar({ symbol, bullishPercent, bearishPercent, trend, lastUpdate }: SentimentBarProps) {
+export function SentimentBar({
+  symbol,
+  bullishPercent,
+  bearishPercent,
+  trend,
+  lastUpdate,
+}: SentimentBarProps) {
   const getTrendIcon = () => {
     if (trend === "up") {
       return <TrendingUp className="h-4 w-4 text-emerald-500" />;
@@ -22,9 +34,7 @@ export function SentimentBar({ symbol, bullishPercent, bearishPercent, trend, la
   return (
     <div className="flex items-center gap-4 py-2">
       {/* Symbol Label */}
-      <div className="w-24 font-semibold text-foreground">
-        {symbol}
-      </div>
+      <div className="w-24 font-semibold text-foreground">{symbol}</div>
 
       {/* Sentiment Bar */}
       <div className="flex-1 relative h-10 flex items-center">
@@ -60,9 +70,7 @@ export function SentimentBar({ symbol, bullishPercent, bearishPercent, trend, la
       </div>
 
       {/* Trend Indicator */}
-      <div className="w-8 flex justify-center">
-        {getTrendIcon()}
-      </div>
+      <div className="w-8 flex justify-center">{getTrendIcon()}</div>
     </div>
   );
 }
@@ -74,7 +82,12 @@ interface SentimentChartProps {
   lastUpdate?: Date;
 }
 
-export function SentimentChart({ bullishPercent, bearishPercent, neutralPercent = 0, lastUpdate }: SentimentChartProps) {
+export function SentimentChart({
+  bullishPercent,
+  bearishPercent,
+  neutralPercent = 0,
+  lastUpdate,
+}: SentimentChartProps) {
   const getTrend = (): "up" | "down" | "neutral" => {
     const diff = bullishPercent - bearishPercent;
     if (diff > 10) return "up";
@@ -120,14 +133,15 @@ export function SentimentChart({ bullishPercent, bearishPercent, neutralPercent 
         {/* Last Update */}
         {lastUpdate && (
           <div className="text-center text-xs text-muted-foreground">
-            Latest update on {lastUpdate.toLocaleString('en-US', {
-              weekday: 'short',
-              day: 'numeric',
-              month: 'long',
-              year: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: true
+            Latest update on{" "}
+            {lastUpdate.toLocaleString("en-US", {
+              weekday: "short",
+              day: "numeric",
+              month: "long",
+              year: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
             })}
           </div>
         )}
@@ -135,4 +149,3 @@ export function SentimentChart({ bullishPercent, bearishPercent, neutralPercent 
     </Card>
   );
 }
-

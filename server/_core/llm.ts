@@ -1,4 +1,4 @@
-import { ENV } from "./env";
+import { getOpenAI } from "server/services/openai";
 
 export type Role = "system" | "user" | "assistant" | "tool" | "function";
 
@@ -209,13 +209,10 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
-const resolveApiUrl = () =>
-  ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
-    ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-    : "https://forge.manus.im/v1/chat/completions";
+const resolveApiUrl = () => "https://api.openai.com/v1/chat/completions";
 
 const assertApiKey = () => {
-  if (!ENV.forgeApiKey) {
+  if (!process.env.OPENAI_API_KEY) {
     throw new Error("OPENAI_API_KEY is not configured");
   }
 };
@@ -277,15 +274,20 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     output_schema,
     responseFormat,
     response_format,
+    maxTokens,
+    max_tokens,
   } = params;
 
+  const openai = getOpenAI();
+
+  const normalizedMessages = messages.map(normalizeMessage) as any;
   const payload: Record<string, unknown> = {
-    model: "gemini-2.5-flash",
-    messages: messages.map(normalizeMessage),
+    model: "gpt-4o-mini",
+    messages: normalizedMessages,
   };
 
   if (tools && tools.length > 0) {
-    payload.tools = tools;
+    payload.tools = tools as any;
   }
 
   const normalizedToolChoice = normalizeToolChoice(
@@ -293,12 +295,12 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     tools
   );
   if (normalizedToolChoice) {
-    payload.tool_choice = normalizedToolChoice;
+    payload.tool_choice = normalizedToolChoice as any;
   }
 
-  payload.max_tokens = 32768
-  payload.thinking = {
-    "budget_tokens": 128
+  const tokenLimit = typeof maxTokens === "number" ? maxTokens : max_tokens;
+  if (typeof tokenLimit === "number") {
+    payload.max_tokens = tokenLimit;
   }
 
   const normalizedResponseFormat = normalizeResponseFormat({
@@ -309,24 +311,37 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   });
 
   if (normalizedResponseFormat) {
-    payload.response_format = normalizedResponseFormat;
+    payload.response_format = normalizedResponseFormat as any;
   }
 
-  const response = await fetch(resolveApiUrl(), {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
-    },
-    body: JSON.stringify(payload),
-  });
+  const completion = await openai.chat.completions.create(payload as any);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      `LLM invoke failed: ${response.status} ${response.statusText} – ${errorText}`
-    );
-  }
-
-  return (await response.json()) as InvokeResult;
+  return {
+    id: completion.id,
+    created: completion.created,
+    model: completion.model,
+    choices: completion.choices.map((choice, idx) => ({
+      index: typeof choice.index === "number" ? choice.index : idx,
+      message: {
+        role: choice.message.role as Role,
+        content: (choice.message.content ?? "") as any,
+        tool_calls: choice.message.tool_calls?.map(tc => ({
+          id: (tc as any).id,
+          type: "function" as const,
+          function: {
+            name: (tc as any).function?.name ?? "",
+            arguments: (tc as any).function?.arguments ?? "",
+          },
+        })),
+      },
+      finish_reason: (choice.finish_reason ?? null) as any,
+    })),
+    usage: completion.usage
+      ? {
+          prompt_tokens: completion.usage.prompt_tokens,
+          completion_tokens: completion.usage.completion_tokens,
+          total_tokens: completion.usage.total_tokens,
+        }
+      : undefined,
+  };
 }

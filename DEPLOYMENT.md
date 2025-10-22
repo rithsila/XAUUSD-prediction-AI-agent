@@ -46,10 +46,9 @@ OPENAI_API_KEY=sk-...your-production-key
 JWT_SECRET=<generate-strong-random-secret>
 NODE_ENV=production
 
-# OAuth (if using Manus Auth)
-OAUTH_SERVER_URL=https://api.manus.im
-VITE_OAUTH_PORTAL_URL=https://oauth.manus.im
-VITE_APP_ID=your-app-id
+# Development login (no external OAuth)
+DEV_LOGIN_ENABLED=true
+VITE_DEV_LOGIN_ENABLED=true
 OWNER_OPEN_ID=your-owner-id
 OWNER_NAME=your-name
 
@@ -57,9 +56,15 @@ OWNER_NAME=your-name
 VITE_APP_TITLE=XAUUSD Prediction Agent
 VITE_APP_LOGO=https://your-cdn.com/logo.png
 
-# Built-in Services (if applicable)
-BUILT_IN_FORGE_API_URL=https://api.manus.im
-BUILT_IN_FORGE_API_KEY=your-forge-key
+# Storage (S3)
+AWS_S3_BUCKET=your-s3-bucket-name
+AWS_REGION=your-aws-region
+# AWS_ACCESS_KEY_ID=your-access-key-id
+# AWS_SECRET_ACCESS_KEY=your-secret-access-key
+
+# Notifications (Telegram; optional)
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+TELEGRAM_CHAT_ID=your-chat-id
 
 # Analytics (optional)
 VITE_ANALYTICS_ENDPOINT=https://analytics.your-domain.com

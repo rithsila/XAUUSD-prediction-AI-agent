@@ -149,7 +149,7 @@ export async function testTelegramConnection(botToken: string, chatId: string): 
 }> {
   try {
     const testMessage: TelegramMessage = {
-      text: "✅ *Telegram Connection Test*\n\nYour XAUUSD Prediction Agent is successfully connected!",
+      text: "✅ *Telegram Connection Test*\n\nYour XPA is successfully connected!",
       parse_mode: "Markdown"
     };
     

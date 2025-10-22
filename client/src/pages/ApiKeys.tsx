@@ -26,6 +26,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Key, Plus, Trash2, Ban, Copy, CheckCircle2 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
+import { APP_TITLE } from "@/const";
 
 export default function ApiKeys() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -122,7 +123,7 @@ export default function ApiKeys() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <AppHeader />
 
       <main className="container mx-auto px-4 py-8">
@@ -346,7 +347,7 @@ string params = "?apiKey=YOUR_API_KEY&horizon=15m&newsLimit=5";`}
       {/* Footer */}
       <footer className="border-t border-border mt-16 py-6">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>XAUUSD Prediction Agent • Powered by OpenAI GPT-4</p>
+          <p>{APP_TITLE} • Powered by OpenAI GPT-4</p>
           <p className="mt-1">Secure API access for automated trading systems</p>
         </div>
       </footer>

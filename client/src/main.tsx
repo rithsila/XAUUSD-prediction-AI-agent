@@ -59,3 +59,15 @@ createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </trpc.Provider>
 );
+
+// Conditionally inject analytics script if configured
+const ANALYTICS_ENDPOINT = import.meta.env.VITE_ANALYTICS_ENDPOINT as string | undefined;
+const ANALYTICS_WEBSITE_ID = import.meta.env.VITE_ANALYTICS_WEBSITE_ID as string | undefined;
+
+if (ANALYTICS_ENDPOINT && ANALYTICS_WEBSITE_ID && typeof document !== "undefined") {
+  const script = document.createElement("script");
+  script.defer = true;
+  script.src = `${ANALYTICS_ENDPOINT.replace(/\/$/, "")}/umami`;
+  script.setAttribute("data-website-id", ANALYTICS_WEBSITE_ID);
+  document.body.appendChild(script);
+}

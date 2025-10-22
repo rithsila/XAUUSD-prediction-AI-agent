@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3C4"/>
+      <stop offset="50%" stop-color="#FACC15"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <radialGradient id="bg" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#0B0B0F"/>
+      <stop offset="100%" stop-color="#0B0F14"/>
+    </radialGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect x="8" y="8" width="112" height="112" rx="24" fill="url(#bg)"/>
+
+  <!-- Golden ring -->
+  <circle cx="64" cy="64" r="42" fill="none" stroke="url(#gold)" stroke-width="6" filter="url(#shadow)"/>
+
+  <!-- Accent glint -->
+  <path d="M30 46 C44 32, 84 28, 98 44" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="3"/>
+
+  <!-- Monogram: XPA -->
+  <g fill="none" stroke="url(#gold)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <!-- X -->
+    <path d="M42 50 L58 66"/>
+    <path d="M58 50 L42 66"/>
+    <!-- P -->
+    <path d="M70 50 L70 78"/>
+    <path d="M70 50 C84 50, 92 54, 92 62 C92 70, 84 74, 70 74"/>
+    <!-- A -->
+    <path d="M98 78 L110 50 L122 78"/>
+    <path d="M104 66 L116 66"/>
+  </g>
+
+  <!-- Subtle inner highlight -->
+  <circle cx="64" cy="64" r="32" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2"/>
+</svg>

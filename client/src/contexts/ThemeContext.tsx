@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "light" | "dark" | "amoled";
 
 interface ThemeContextType {
   theme: Theme;
   toggleTheme?: () => void;
+  setTheme?: (theme: Theme) => void;
   switchable: boolean;
 }
 
@@ -21,7 +22,7 @@ export function ThemeProvider({
   defaultTheme = "light",
   switchable = false,
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
+  const [theme, setInternalTheme] = useState<Theme>(() => {
     if (switchable) {
       const stored = localStorage.getItem("theme");
       return (stored as Theme) || defaultTheme;
@@ -31,10 +32,18 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = document.documentElement;
+
+    // Apply classes for theme variants.
     if (theme === "dark") {
       root.classList.add("dark");
+      root.classList.remove("amoled");
+    } else if (theme === "amoled") {
+      // AMOLED is a dark-derived theme, so ensure dark is set as well for base tokens.
+      root.classList.add("dark");
+      root.classList.add("amoled");
     } else {
       root.classList.remove("dark");
+      root.classList.remove("amoled");
     }
 
     if (switchable) {
@@ -44,12 +53,18 @@ export function ThemeProvider({
 
   const toggleTheme = switchable
     ? () => {
-        setTheme(prev => (prev === "light" ? "dark" : "light"));
+        setInternalTheme(prev => (prev === "light" ? "dark" : "light"));
+      }
+    : undefined;
+
+  const setTheme = switchable
+    ? (t: Theme) => {
+        setInternalTheme(t);
       }
     : undefined;
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, switchable }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, switchable }}>
       {children}
     </ThemeContext.Provider>
   );

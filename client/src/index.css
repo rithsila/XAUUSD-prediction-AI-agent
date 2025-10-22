@@ -43,6 +43,7 @@
 }
 
 :root {
+  /* Primary palette tuned for iOS glass aesthetics */
   --primary: var(--color-blue-700);
   --primary-foreground: var(--color-blue-50);
   --sidebar-primary: var(--color-blue-600);
@@ -52,10 +53,12 @@
   --chart-3: var(--color-red-500);
   --chart-4: var(--color-blue-500);
   --chart-5: var(--color-purple-500);
-  --radius: 0.65rem;
-  --background: oklch(1 0 0);
+  --radius: 0.8rem; /* slightly larger radii for softer glass corners */
+
+  /* Base surfaces and text */
+  --background: oklch(0.99 0.004 250); /* neutral, works with gradient background below */
   --foreground: oklch(0.235 0.015 65);
-  --card: oklch(1 0 0);
+  --card: oklch(1 0 0); /* used as base, overridden by glass variables below */
   --card-foreground: oklch(0.235 0.015 65);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.235 0.015 65);
@@ -76,6 +79,14 @@
   --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.623 0.214 259.815);
+
+  /* Glass tokens */
+  --glass-bg: oklch(1 0 0 / 0.6);
+  --glass-border: oklch(1 0 0 / 0.35);
+  --glass-highlight: oklch(0.95 0.01 260 / 0.25);
+  --glass-backdrop: saturate(160%) blur(14px);
+  --glass-shadow-md: 0 8px 24px rgba(0,0,0,0.08), inset 0 1px rgba(255,255,255,0.25);
+  --glass-shadow-lg: 0 16px 40px rgba(0,0,0,0.1), inset 0 1px rgba(255,255,255,0.25);
 }
 
 .dark {
@@ -83,8 +94,8 @@
   --primary-foreground: var(--color-slate-950);
   --sidebar-primary: var(--color-amber-600);
   --sidebar-primary-foreground: var(--color-slate-950);
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.85 0.005 65);
+  --background: oklch(0.12 0.01 280);
+  --foreground: oklch(0.9 0.005 65);
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: oklch(0.85 0.005 65);
   --popover: oklch(0.21 0.006 285.885);
@@ -94,11 +105,11 @@
   --muted: oklch(0.274 0.006 286.033);
   --muted-foreground: oklch(0.705 0.015 286.067);
   --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
+  --accent-foreground: oklch(0.92 0.005 65);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
   --ring: oklch(0.488 0.243 264.376);
   --chart-1: var(--color-amber-400);
   --chart-2: var(--color-emerald-500);
@@ -108,9 +119,61 @@
   --sidebar: oklch(0.21 0.006 285.885);
   --sidebar-foreground: oklch(0.85 0.005 65);
   --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.488 0.243 264.376);
+
+  /* Dark glass tokens */
+  --glass-bg: oklch(0.14 0.005 280 / 0.42);
+  --glass-border: oklch(1 0 0 / 0.12);
+  --glass-highlight: oklch(0.55 0.02 260 / 0.08);
+  --glass-backdrop: saturate(130%) blur(12px);
+  --glass-shadow-md: 0 6px 20px rgba(0,0,0,0.35), inset 0 1px rgba(255,255,255,0.05);
+  --glass-shadow-lg: 0 14px 36px rgba(0,0,0,0.4), inset 0 1px rgba(255,255,255,0.05);
+}
+
+/* AMOLED variant: deeper blacks, reduced glow, increased contrast */
+.amoled {
+  --primary: var(--color-amber-600);
+  --primary-foreground: var(--color-slate-950);
+  --sidebar-primary: var(--color-amber-600);
+  --sidebar-primary-foreground: var(--color-slate-950);
+  --background: oklch(0.03 0 0); /* near-black */
+  --foreground: oklch(0.94 0.003 65);
+  --card: oklch(0.05 0 0);
+  --card-foreground: oklch(0.92 0.003 65);
+  --popover: oklch(0.05 0 0);
+  --popover-foreground: oklch(0.92 0.003 65);
+  --secondary: oklch(0.08 0.002 286);
+  --secondary-foreground: oklch(0.85 0.003 65);
+  --muted: oklch(0.08 0.002 286);
+  --muted-foreground: oklch(0.8 0.01 286);
+  --accent: oklch(0.12 0.003 286);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.68 0.19 22);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.55 0.24 264);
+  --chart-1: var(--color-amber-400);
+  --chart-2: var(--color-emerald-500);
+  --chart-3: var(--color-red-500);
+  --chart-4: var(--color-blue-500);
+  --chart-5: var(--color-purple-500);
+  --sidebar: oklch(0.05 0 0);
+  --sidebar-foreground: oklch(0.92 0.003 65);
+  --sidebar-accent: oklch(0.12 0.003 286);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.55 0.24 264);
+
+  /* AMOLED glass tokens: almost no glow, subtle borders */
+  --glass-bg: oklch(0 0 0 / 0.6);
+  --glass-border: oklch(1 0 0 / 0.08);
+  --glass-highlight: oklch(0.85 0.01 260 / 0.04);
+  --glass-backdrop: saturate(115%) blur(10px);
+  --glass-shadow-md: 0 4px 16px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.03);
+  --glass-shadow-lg: 0 12px 28px rgba(0,0,0,0.6), inset 0 1px rgba(255,255,255,0.03);
 }
 
 @layer base {
@@ -118,7 +181,23 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    /* Gradient wallpaper backdrop for glass aesthetics */
+    background: radial-gradient(1200px 600px at 10% -10%, oklch(0.95 0.03 260 / 0.7), transparent 70%),
+      radial-gradient(800px 400px at 100% 10%, oklch(0.95 0.04 130 / 0.6), transparent 70%),
+      linear-gradient(180deg, oklch(0.99 0.004 250), oklch(0.96 0.01 250));
+    color: var(--foreground);
+  }
+  .dark body {
+    /* Dark mode wallpaper: reduce brightness and saturation */
+    background: radial-gradient(1000px 500px at 10% -10%, oklch(0.19 0.06 280 / 0.55), transparent 70%),
+      radial-gradient(800px 400px at 100% 10%, oklch(0.18 0.07 130 / 0.5), transparent 70%),
+      linear-gradient(180deg, oklch(0.12 0.01 280), oklch(0.16 0.02 280));
+    color: var(--foreground);
+  }
+  .amoled body {
+    /* AMOLED wallpaper: pure blacks, no large gradients to save power */
+    background: oklch(0 0 0);
+    color: var(--foreground);
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -131,22 +210,18 @@
   input[type="radio"]:not(:disabled) {
     @apply cursor-pointer;
   }
+
+  /* Prefer reduced motion accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
 }
 
 @layer components {
-  /**
-   * Custom container utility that centers content and adds responsive padding.
-   *
-   * This overrides Tailwind's default container behavior to:
-   * - Auto-center content (mx-auto)
-   * - Add responsive horizontal padding
-   * - Set max-width for large screens
-   *
-   * Usage: <div className="container">...</div>
-   *
-   * For custom widths, use max-w-* utilities directly:
-   * <div className="max-w-6xl mx-auto px-4">...</div>
-   */
+  /** Container utility **/
   .container {
     width: 100%;
     margin-left: auto;
@@ -168,5 +243,74 @@
       padding-right: 2rem;
       max-width: 1280px; /* Standard content width */
     }
+  }
+
+  /* Glass primitives */
+  .glass {
+    position: relative;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-backdrop);
+    backdrop-filter: var(--glass-backdrop);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-md);
+    will-change: transform, opacity;
+    transition: background-color 250ms ease, box-shadow 250ms ease, transform 250ms ease, opacity 200ms ease;
+  }
+
+  .glass:hover {
+    box-shadow: var(--glass-shadow-lg);
+  }
+
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(120% 120% at 15% 0%, var(--glass-highlight), transparent 65%);
+  }
+
+  /* Apply glass treatment to existing UI slots */
+  [data-slot="card"] {
+    border-radius: var(--radius-xl);
+  }
+  [data-slot="card"],
+  header.glass-nav,
+  [data-slot="sidebar-container"],
+  .glass-surface {
+    /* share glass styles */
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-backdrop);
+    backdrop-filter: var(--glass-backdrop);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-md);
+    will-change: transform, opacity;
+  }
+
+  [data-slot="card"]::before,
+  header.glass-nav::before,
+  [data-slot="sidebar-container"]::before,
+  .glass-surface::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(100% 100% at 10% 0%, var(--glass-highlight), transparent 65%);
+  }
+
+  /* Navigation bar specific styles */
+  header.glass-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--glass-border);
+    background-clip: padding-box;
+  }
+
+  /* Focus ring for accessibility */
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
