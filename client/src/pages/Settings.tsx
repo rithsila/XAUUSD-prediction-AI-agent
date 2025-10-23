@@ -190,7 +190,7 @@ export default function Settings() {
                     min={5}
                     max={1440}
                     value={settings.scrapingInterval ?? 60}
-                    onChange={(e) =>
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       handleSaveAutomation({ scrapingInterval: parseInt(e.target.value) })
                     }
                     placeholder="60"
@@ -232,7 +232,7 @@ export default function Settings() {
                     min={5}
                     max={1440}
                     value={settings.predictionInterval ?? 60}
-                    onChange={(e) =>
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       handleSaveAutomation({ predictionInterval: parseInt(e.target.value) })
                     }
                     placeholder="60"
@@ -249,7 +249,7 @@ export default function Settings() {
                     min={0}
                     max={100}
                     value={settings.minImpactScore ?? 50}
-                    onChange={(e) =>
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       handleSaveAutomation({ minImpactScore: parseInt(e.target.value) })
                     }
                     placeholder="50"
@@ -295,7 +295,7 @@ export default function Settings() {
                   <Input
                     type="text"
                     value={telegramBotToken}
-                    onChange={(e) => setTelegramBotToken(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTelegramBotToken(e.target.value)}
                     placeholder={settings.telegramBotToken || "Enter Bot Token"}
                   />
                 </div>
@@ -305,7 +305,7 @@ export default function Settings() {
                   <Input
                     type="text"
                     value={telegramChannelId}
-                    onChange={(e) => setTelegramChannelId(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTelegramChannelId(e.target.value)}
                     placeholder={settings.telegramChannelId || "Enter Channel ID"}
                   />
                 </div>

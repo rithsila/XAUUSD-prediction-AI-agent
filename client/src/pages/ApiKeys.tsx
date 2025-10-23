@@ -28,6 +28,19 @@ import { Key, Plus, Trash2, Ban, Copy, CheckCircle2 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { APP_TITLE } from "@/const";
 
+// Local type mirroring server ApiKey shape used in UI
+export type ApiKeyItem = {
+  id: string;
+  apiKey: string;
+  name: string;
+  username: string;
+  type: "MT5" | "TradingView";
+  status: "active" | "revoked" | "expired";
+  requestCount?: number | null;
+  lastUsedAt?: string | Date | null;
+  expiresAt?: string | Date | null;
+};
+
 export default function ApiKeys() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -161,7 +174,7 @@ export default function ApiKeys() {
                       id="name"
                       placeholder="My MT5 EA"
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
                     />
                   </div>
                   <div>
@@ -170,7 +183,7 @@ export default function ApiKeys() {
                       id="username"
                       placeholder="trader123"
                       value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
                     />
                   </div>
                   <div>
@@ -191,7 +204,7 @@ export default function ApiKeys() {
                       id="expires"
                       type="datetime-local"
                       value={expiresAt}
-                      onChange={(e) => setExpiresAt(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setExpiresAt(e.target.value)}
                     />
                   </div>
                 </div>
@@ -232,7 +245,7 @@ export default function ApiKeys() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {apiKeys.map((key) => (
+                    {apiKeys.map((key: ApiKeyItem) => (
                       <TableRow key={key.id}>
                         <TableCell className="font-medium">{key.name}</TableCell>
                         <TableCell>{getTypeBadge(key.type)}</TableCell>

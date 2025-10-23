@@ -2,15 +2,70 @@ import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, predictions, InsertPrediction, newsEvents, InsertNewsEvent, mt5Notifications, InsertMT5Notification, apiKeys, InsertApiKey, sentimentData, InsertSentimentData, newsSources, InsertNewsSource, scrapedArticles, InsertScrapedArticle, economicEvents, InsertEconomicEvent, systemSettings, InsertSystemSettings } from "../drizzle/schema";
 import { sql } from "drizzle-orm";
+import mysql from "mysql2/promise";
 import { ENV } from './_core/env';
 
-let _db: ReturnType<typeof drizzle> | null = null;
+let _db: any | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  if (!_db) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      const host = process.env.DB_HOST;
+      const port = process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined;
+      const user = process.env.DB_USERNAME;
+      const password = process.env.DB_PASSWORD;
+      const database = process.env.DB_DATABASE;
+
+      const hasDirect = host && port && user && password && database;
+
+      const buildSsl = (): any | undefined => {
+        const sslEnv = process.env.DB_SSL;
+        if (sslEnv) {
+          const v = sslEnv.toLowerCase();
+          if (v === "true") return { rejectUnauthorized: true };
+          if (v === "false") return undefined;
+          try { return JSON.parse(sslEnv); } catch { return undefined; }
+        }
+        const url = process.env.DATABASE_URL || "";
+        if (url.includes("ssl=true")) return { rejectUnauthorized: true };
+        return undefined;
+      };
+
+      if (hasDirect) {
+        const pool = mysql.createPool({
+          host,
+          port,
+          user,
+          password,
+          database,
+          ssl: buildSsl(),
+          waitForConnections: true,
+          connectionLimit: 10,
+        });
+        _db = drizzle(pool);
+      } else if (process.env.DATABASE_URL) {
+        try {
+          const u = new URL(process.env.DATABASE_URL);
+          const pool = mysql.createPool({
+            host: u.hostname,
+            port: u.port ? Number(u.port) : 3306,
+            user: decodeURIComponent(u.username),
+            password: decodeURIComponent(u.password),
+            database: u.pathname.replace(/^\//, ""),
+            ssl: buildSsl(),
+            waitForConnections: true,
+            connectionLimit: 10,
+          });
+          _db = drizzle(pool);
+        } catch (err) {
+          console.warn("[Database] Failed to parse DATABASE_URL:", err);
+          _db = null;
+        }
+      } else {
+        console.warn("[Database] Missing DB credentials");
+        _db = null;
+      }
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -330,7 +385,7 @@ export async function getAllSentimentSymbols() {
       .selectDistinct({ symbol: sentimentData.symbol })
       .from(sentimentData);
 
-    return result.map(r => r.symbol);
+    return result.map((r: { symbol: string }) => r.symbol);
   } catch (error) {
     console.error("[Database] Failed to get symbols:", error);
     return [];

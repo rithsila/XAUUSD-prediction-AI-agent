@@ -10,6 +10,7 @@ import {
   updateApiKeyUsage 
 } from "../db";
 import { randomBytes } from "crypto";
+import type { ApiKey } from "../../drizzle/schema";
 
 /**
  * API Keys Router
@@ -59,7 +60,7 @@ export const apiKeysRouter = router({
     
     // Check for expired keys and update status
     const now = new Date();
-    const keysWithStatus = keys.map(key => {
+    const keysWithStatus = keys.map((key: ApiKey) => {
       if (key.status === "active" && key.expiresAt && key.expiresAt < now) {
         return { ...key, status: "expired" as const };
       }

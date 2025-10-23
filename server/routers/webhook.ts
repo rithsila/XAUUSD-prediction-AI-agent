@@ -2,6 +2,7 @@ import { z } from "zod";
 import { router, publicProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getApiKey, updateApiKeyUsage, getLatestPrediction, getLatestNews } from "../db";
+import type { NewsEvent } from "../../drizzle/schema";
 
 /**
  * Webhook Router
@@ -129,7 +130,7 @@ export const webhookRouter = router({
 
       return {
         status: "ok" as const,
-        data: news.map(item => ({
+        data: news.map((item: NewsEvent) => ({
           source: item.source,
           headline: item.headline,
           timestamp: item.timestamp.toISOString(),
@@ -206,7 +207,7 @@ export const webhookRouter = router({
           },
           rationale: prediction.rationale as string[] | null,
         } : null,
-        news: news.map(item => ({
+        news: news.map((item: NewsEvent) => ({
           source: item.source,
           headline: item.headline,
           timestamp: item.timestamp.toISOString(),

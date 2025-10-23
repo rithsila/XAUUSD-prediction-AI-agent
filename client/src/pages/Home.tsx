@@ -25,6 +25,17 @@ import {
 import { AppHeader } from "@/components/AppHeader";
 import { APP_TITLE } from "@/const";
 
+// Local type for prediction history items used in UI
+type PredictionItem = {
+  id: string;
+  horizon: "3m" | "5m" | "15m" | "1H" | "4H";
+  direction: "bull" | "bear" | "neutral";
+  timestamp: string | Date;
+  confidence: number;
+  rangeMin?: number | null;
+  rangeMax?: number | null;
+};
+
 export default function Home() {
   const [selectedHorizon, setSelectedHorizon] = useState<
     "3m" | "5m" | "15m" | "1H" | "4H"
@@ -182,7 +193,7 @@ export default function Home() {
             <CardContent>
               {predictionHistory && predictionHistory.length > 0 ? (
                 <div className="space-y-3">
-                  {predictionHistory.map(pred => (
+                  {predictionHistory.map((pred: PredictionItem) => (
                     <div
                       key={pred.id}
                       className="flex items-center justify-between p-3 rounded-lg border border-border bg-card/50"

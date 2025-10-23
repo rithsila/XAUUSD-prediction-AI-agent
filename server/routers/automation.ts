@@ -5,6 +5,7 @@ import { scrapeAllNews } from "../services/newsScraper";
 import { runAutomatedAnalysis } from "../services/autoPredictionAgent";
 import { sendTelegramMessage, formatPredictionMessage, testTelegramConnection } from "../services/telegram";
 import { nanoid } from "nanoid";
+import type { NewsSource } from "../../drizzle/schema";
 
 export const automationRouter = router({
   // Get system settings
@@ -75,7 +76,7 @@ export const automationRouter = router({
       };
     }
     
-    const sourcesForScraping = sources.map(s => ({
+    const sourcesForScraping = sources.map((s: NewsSource) => ({
       id: s.id,
       name: s.name,
       type: s.type,
