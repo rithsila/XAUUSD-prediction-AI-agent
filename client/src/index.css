@@ -87,6 +87,14 @@
   --glass-backdrop: saturate(160%) blur(14px);
   --glass-shadow-md: 0 8px 24px rgba(0,0,0,0.08), inset 0 1px rgba(255,255,255,0.25);
   --glass-shadow-lg: 0 16px 40px rgba(0,0,0,0.1), inset 0 1px rgba(255,255,255,0.25);
+
+  /* Motion tokens (approx. iOS Liquid-style) */
+  --motion-duration-fast: 150ms;
+  --motion-duration-normal: 250ms;
+  --motion-duration-slow: 550ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  /* Slight overshoot for liquid feel */
+  --motion-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .dark {
@@ -254,7 +262,10 @@
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow-md);
     will-change: transform, opacity;
-    transition: background-color 250ms ease, box-shadow 250ms ease, transform 250ms ease, opacity 200ms ease;
+    transition: background-color var(--motion-duration-normal) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-normal) var(--motion-ease-standard),
+      transform var(--motion-duration-normal) var(--motion-ease-standard),
+      opacity var(--motion-duration-fast) var(--motion-ease-standard);
   }
 
   .glass:hover {
@@ -306,6 +317,106 @@
     z-index: 50;
     border-bottom: 1px solid var(--glass-border);
     background-clip: padding-box;
+    /* Liquid header base variables */
+    --liquid-blur: 14px;
+    --liquid-sat: 1.35;
+    --liquid-scale: 1;
+    transform: translateZ(0) scale(var(--liquid-scale));
+    /* Entrance animation */
+    animation: liquid-header-enter var(--motion-duration-slow) var(--motion-ease-emphasized) both;
+  }
+
+  /* Header-like slots share the same entrance treatment */
+  [data-slot$="header"] {
+    --liquid-blur: 12px;
+    --liquid-sat: 1.25;
+    --liquid-scale: 1;
+    transform: translateZ(0) scale(var(--liquid-scale));
+    animation: liquid-header-enter var(--motion-duration-normal) var(--motion-ease-emphasized) both;
+  }
+
+  /* Prefer typed custom properties for smooth interpolation where supported */
+  @property --liquid-blur {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 12px;
+  }
+  @property --liquid-sat {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 1.3;
+  }
+  @property --liquid-scale {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 1;
+  }
+
+  /* Keyframes approximating iOS liquid glass motion */
+  @keyframes liquid-header-enter {
+    0% {
+      opacity: 0;
+      --liquid-blur: 18px;
+      --liquid-sat: 1.45;
+      --liquid-scale: 0.985;
+      transform: translateY(-8px) scale(var(--liquid-scale));
+    }
+    50% {
+      opacity: 1;
+      --liquid-blur: 14px;
+      --liquid-sat: 1.35;
+      --liquid-scale: 1.01; /* subtle overshoot */
+      transform: translateY(0) scale(var(--liquid-scale));
+    }
+    100% {
+      opacity: 1;
+      --liquid-blur: 12px;
+      --liquid-sat: 1.3;
+      --liquid-scale: 1;
+      transform: translateY(0) scale(var(--liquid-scale));
+    }
+  }
+
+  /* Short pulse used on route changes */
+  @keyframes liquid-header-pulse {
+    0% {
+      --liquid-blur: 12px;
+      --liquid-sat: 1.3;
+      --liquid-scale: 1;
+      transform: translateY(0) scale(var(--liquid-scale));
+    }
+    40% {
+      --liquid-blur: 15px;
+      --liquid-sat: 1.4;
+      --liquid-scale: 1.012;
+      transform: translateY(0) scale(var(--liquid-scale));
+    }
+    100% {
+      --liquid-blur: 12px;
+      --liquid-sat: 1.3;
+      --liquid-scale: 1;
+      transform: translateY(0) scale(var(--liquid-scale));
+    }
+  }
+
+  .liquid-pulse {
+    animation: liquid-header-pulse var(--motion-duration-normal) var(--motion-ease-emphasized);
+  }
+
+  /* Backdrop animation via interpolated variables where supported */
+  @supports ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) {
+    header.glass-nav,
+    [data-slot$="header"] {
+      -webkit-backdrop-filter: saturate(calc(var(--liquid-sat) * 100%)) blur(var(--liquid-blur));
+      backdrop-filter: saturate(calc(var(--liquid-sat) * 100%)) blur(var(--liquid-blur));
+    }
+  }
+  /* Fallback for browsers without backdrop-filter */
+  @supports not ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) {
+    header.glass-nav,
+    [data-slot$="header"] {
+      background: color-mix(in oklab, var(--glass-bg) 85%, white 15%);
+    }
   }
 
   /* Focus ring for accessibility */

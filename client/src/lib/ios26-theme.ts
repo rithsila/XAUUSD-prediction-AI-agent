@@ -187,11 +187,12 @@ export const ios26Theme: IOS26ThemeTokens = {
     durations: {
       fast: 150,
       normal: 250,
-      slow: 400,
+      slow: 550,
     },
     easings: {
       standard: "cubic-bezier(0.2, 0, 0, 1)",
-      emphasized: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      // Slight overshoot for liquid feel
+      emphasized: "cubic-bezier(0.2, 0.8, 0.2, 1)",
     },
   },
   typography: {

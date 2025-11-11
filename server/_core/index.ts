@@ -30,11 +30,19 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
-  // Configure body parser with larger size limit for file uploads
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+  // IMPORTANT: Do not attach JSON/urlencoded body parsers to the tRPC route.
+  // tRPC's Express adapter reads the raw Request body itself (req.json()).
+  // Using express.json() on /api/trpc will consume the body and cause
+  // "Invalid input: expected object, received undefined" on mutations.
+  // If you need body parsing for other routes, attach it to those routes only.
+  // We currently only use /api/auth/* which doesn't require JSON bodies.
+  // app.use(express.json({ limit: "50mb" }));
+  // app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
   // Local dev login route under /api/auth/dev-login
   registerAuthRoutes(app);
+
   // tRPC API
   app.use(
     "/api/trpc",
@@ -43,6 +51,7 @@ async function startServer() {
       createContext,
     })
   );
+
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);

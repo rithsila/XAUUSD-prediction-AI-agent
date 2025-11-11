@@ -25,7 +25,6 @@ import {
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Key, Plus, Trash2, Ban, Copy, CheckCircle2 } from "lucide-react";
-import { AppHeader } from "@/components/AppHeader";
 import { APP_TITLE } from "@/const";
 
 // Local type mirroring server ApiKey shape used in UI
@@ -137,7 +136,6 @@ export default function ApiKeys() {
 
   return (
     <div className="min-h-screen">
-      <AppHeader />
 
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-6">

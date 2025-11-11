@@ -11,7 +11,6 @@ import {
 import { SentimentBar } from "@/components/SentimentBar";
 import { RefreshCw, TrendingUp, TrendingDown } from "lucide-react";
 import { toast } from "sonner";
-import { AppHeader } from "@/components/AppHeader";
 
 export default function Sentiment() {
   const [selectedSymbol, setSelectedSymbol] = useState("XAUUSD");
@@ -67,7 +66,6 @@ export default function Sentiment() {
 
   return (
     <div className="min-h-screen">
-      <AppHeader />
 
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
@@ -219,6 +217,7 @@ export default function Sentiment() {
                           bullishPercent={sentiment.longPercentage}
                           bearishPercent={sentiment.shortPercentage}
                           trend={getTrend(sentiment.longPercentage)}
+                          showSymbolLabel={false}
                         />
                       </div>
                     ))}

@@ -13,6 +13,8 @@ interface SentimentBarProps {
   bearishPercent: number;
   trend?: "up" | "down" | "neutral";
   lastUpdate?: Date;
+  // New: allow hiding the symbol label to avoid duplication when a heading already shows it
+  showSymbolLabel?: boolean;
 }
 
 export function SentimentBar({
@@ -21,6 +23,7 @@ export function SentimentBar({
   bearishPercent,
   trend,
   lastUpdate,
+  showSymbolLabel = true,
 }: SentimentBarProps) {
   const getTrendIcon = () => {
     if (trend === "up") {
@@ -34,7 +37,9 @@ export function SentimentBar({
   return (
     <div className="flex items-center gap-4 py-2">
       {/* Symbol Label */}
-      <div className="w-24 font-semibold text-foreground">{symbol}</div>
+      {showSymbolLabel && (
+        <div className="w-24 font-semibold text-foreground">{symbol}</div>
+      )}
 
       {/* Sentiment Bar */}
       <div className="flex-1 relative h-10 flex items-center">

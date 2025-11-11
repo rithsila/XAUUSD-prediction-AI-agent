@@ -7,7 +7,7 @@ export const APP_LOGO =
   "https://placehold.co/128x128/E1E7EF/1F2937?text=App";
 
 // Generate login URL at runtime.
-// Previously supported Manus OAuth; now using dev-login only.
+// Route to the client-side Login page, which can fallback to dev-login.
 export const getLoginUrl = () => {
-  return "/api/auth/dev-login";
+  return "/login";
 };

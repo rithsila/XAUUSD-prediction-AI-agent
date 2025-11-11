@@ -22,7 +22,6 @@ import {
   Minus,
   Activity,
 } from "lucide-react";
-import { AppHeader } from "@/components/AppHeader";
 import { APP_TITLE } from "@/const";
 
 // Local type for prediction history items used in UI
@@ -74,7 +73,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <AppHeader />
 
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-6">

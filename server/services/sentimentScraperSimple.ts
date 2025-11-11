@@ -237,7 +237,17 @@ export async function fetchAllSentiment(
   ]);
 
   const sentimentData: SentimentData[] = [];
-  const sources = ["MyFxBook", "Dukascopy", "FXSSI", "OANDA"];
+  // Expanded sources list (additional brokers can be swapped to real scrapers later)
+  const sources = [
+    "MyFxBook",
+    "Dukascopy",
+    "FXSSI",
+    "OANDA",
+    "IG",
+    "FXCM",
+    "Pepperstone",
+    "Forex.com",
+  ];
 
   // Collect successful scrapes
   for (let i = 0; i < results.length; i++) {
@@ -247,16 +257,16 @@ export async function fetchAllSentiment(
     }
   }
 
-  // If we got less than 3 sources, fill with mock data
-  if (sentimentData.length < 3) {
+  // If we have fewer sources than desired, fill with mock data for missing ones
+  if (sentimentData.length < sources.length) {
     console.log(
-      `[SentimentScraper] Only got ${sentimentData.length} real sources, adding mock data`
+      `[SentimentScraper] Only got ${sentimentData.length} real sources, adding mock data to reach ${sources.length}`
     );
 
     const existingSources = new Set(sentimentData.map(d => d.source));
 
     for (const source of sources) {
-      if (!existingSources.has(source) && sentimentData.length < 4) {
+      if (!existingSources.has(source)) {
         sentimentData.push(generateMockSentiment(symbol, source));
       }
     }

@@ -6,7 +6,8 @@ export const ENV = {
   ownerId: process.env.OWNER_OPEN_ID ?? "",
   isProduction: process.env.NODE_ENV === "production",
   // Dev login support
-  devLoginEnabled: (process.env.DEV_LOGIN_ENABLED ?? "false").toLowerCase() === "true",
+  devLoginEnabled:
+    (process.env.DEV_LOGIN_ENABLED ?? "false").toLowerCase() === "true",
   devUserId: process.env.DEV_USER_ID ?? "",
   devUserName: process.env.DEV_USER_NAME ?? "",
   devUserEmail: process.env.DEV_USER_EMAIL ?? "",

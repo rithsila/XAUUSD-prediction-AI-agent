@@ -2,7 +2,8 @@ import { z } from "zod";
 import { publicProcedure, router } from "../_core/trpc";
 import { nanoid } from "nanoid";
 import * as db from "../db";
-import { fetchAllSentiment, calculateAverageSentiment } from "../services/sentimentScraperSimple";
+import { fetchAllSentiment as fetchAllSentimentSimple, calculateAverageSentiment } from "../services/sentimentScraperSimple";
+import { fetchAllSentiment as fetchAllSentimentHeadless } from "../services/sentimentScraper";
 
 export const sentimentRouter = router({
   /**
@@ -15,8 +16,23 @@ export const sentimentRouter = router({
     .mutation(async ({ input }) => {
       const { symbol } = input;
 
-      // Fetch sentiment from all sources
-      const sentiments = await fetchAllSentiment(symbol);
+      // Prefer headless scrapers for real data (MyFxBook, Dukascopy, FXSSI)
+      const headlessReal = await fetchAllSentimentHeadless(symbol);
+
+      // Always produce a complete 8-source set using the simple scraper's
+      // fallback/mocks; then override entries we managed to scrape for real.
+      const filled = await fetchAllSentimentSimple(symbol);
+
+      const bySource = new Map<string, typeof filled[0] & { source: string }>();
+      for (const s of filled) {
+        bySource.set(s.source, s);
+      }
+
+      for (const r of headlessReal) {
+        bySource.set(r.source, r);
+      }
+
+      const sentiments = Array.from(bySource.values());
 
       // Save each sentiment to database
       for (const sentiment of sentiments) {

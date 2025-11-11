@@ -3,16 +3,27 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Bell, Newspaper, Play, Loader2 } from "lucide-react";
-import { AppHeader } from "@/components/AppHeader";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Settings() {
-  const { data: settings, isLoading, isError, error, refetch } = trpc.automation.getSettings.useQuery(undefined, {
+  const {
+    data: settings,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = trpc.automation.getSettings.useQuery(undefined, {
     retry: false,
   });
   const updateSettings = trpc.automation.updateSettings.useMutation();
@@ -44,14 +55,33 @@ export default function Settings() {
             <AlertDescription>
               <p className="mb-2">{errorMessage}</p>
               <ul className="list-disc pl-5 space-y-1 text-sm">
-                <li>Make sure the backend server is running at <code className="font-mono">http://localhost:3000</code>.</li>
-                <li>If you are viewing the app on <code className="font-mono">http://localhost:5173</code>, enable a proxy to <code className="font-mono">/api</code> or open it via <code className="font-mono">http://localhost:3000</code>.</li>
-                <li>You can also try the dev login at <code className="font-mono">/api/auth/dev-login</code> if authentication is required.</li>
+                <li>
+                  Make sure the backend server is running at{" "}
+                  <code className="font-mono">http://localhost:3000</code>.
+                </li>
+                <li>
+                  If you are viewing the app on{" "}
+                  <code className="font-mono">http://localhost:5173</code>,
+                  enable a proxy to <code className="font-mono">/api</code> or
+                  open it via{" "}
+                  <code className="font-mono">http://localhost:3000</code>.
+                </li>
+                <li>
+                  You can also try the dev login at{" "}
+                  <code className="font-mono">/api/auth/dev-login</code> if
+                  authentication is required.
+                </li>
               </ul>
             </AlertDescription>
           </Alert>
           <div className="flex justify-end">
-            <Button variant="outline" onClick={() => refetch()} className="focus-ring">Retry</Button>
+            <Button
+              variant="outline"
+              onClick={() => refetch()}
+              className="focus-ring"
+            >
+              Retry
+            </Button>
           </div>
         </div>
       </div>
@@ -79,8 +109,10 @@ export default function Settings() {
   const handleSaveTelegram = async () => {
     try {
       await updateSettings.mutateAsync({
-        telegramBotToken: telegramBotToken || settings.telegramBotToken || undefined,
-        telegramChannelId: telegramChannelId || settings.telegramChannelId || undefined,
+        telegramBotToken:
+          telegramBotToken || settings.telegramBotToken || undefined,
+        telegramChannelId:
+          telegramChannelId || settings.telegramChannelId || undefined,
       });
       toast.success("Telegram settings saved!");
       refetch();
@@ -118,7 +150,9 @@ export default function Settings() {
     try {
       const result = await scrapeNews.mutateAsync();
       if (result.success) {
-        toast.success(`Scraped ${result.articlesScraped} articles and ${result.eventsScraped} events!`);
+        toast.success(
+          `Scraped ${result.articlesScraped} articles and ${result.eventsScraped} events!`
+        );
       } else {
         toast.error(result.error || "Failed to scrape news");
       }
@@ -132,7 +166,9 @@ export default function Settings() {
       const result = await runAnalysis.mutateAsync();
       toast.success(
         `Analyzed ${result.articlesAnalyzed} articles. ` +
-        (result.predictionGenerated ? `Prediction generated!` : "No prediction generated.")
+          (result.predictionGenerated
+            ? `Prediction generated!`
+            : "No prediction generated.")
       );
     } catch (error) {
       toast.error("Failed to run analysis");
@@ -141,12 +177,13 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen">
-      <AppHeader />
 
       <div className="container py-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold">Settings & Automation</h1>
-          <p className="text-sm text-muted-foreground">Configure automated news scraping, predictions, and alerts</p>
+          <p className="text-sm text-muted-foreground">
+            Configure automated news scraping, predictions, and alerts
+          </p>
         </div>
       </div>
 
@@ -164,7 +201,8 @@ export default function Settings() {
               <CardHeader>
                 <CardTitle>News Scraping Automation</CardTitle>
                 <CardDescription>
-                  Automatically scrape news from configured sources at regular intervals
+                  Automatically scrape news from configured sources at regular
+                  intervals
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -177,7 +215,7 @@ export default function Settings() {
                   </div>
                   <Switch
                     checked={settings.autoScrapingEnabled ?? false}
-                    onCheckedChange={(checked) =>
+                    onCheckedChange={checked =>
                       handleSaveAutomation({ autoScrapingEnabled: checked })
                     }
                   />
@@ -191,7 +229,9 @@ export default function Settings() {
                     max={1440}
                     value={settings.scrapingInterval ?? 60}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleSaveAutomation({ scrapingInterval: parseInt(e.target.value) })
+                      handleSaveAutomation({
+                        scrapingInterval: parseInt(e.target.value),
+                      })
                     }
                     placeholder="60"
                   />
@@ -214,12 +254,13 @@ export default function Settings() {
                   <div className="space-y-0.5">
                     <Label>Enable Auto-Prediction</Label>
                     <p className="text-sm text-muted-foreground">
-                      AI will analyze news and generate predictions automatically
+                      AI will analyze news and generate predictions
+                      automatically
                     </p>
                   </div>
                   <Switch
                     checked={settings.autoPredictionEnabled ?? false}
-                    onCheckedChange={(checked) =>
+                    onCheckedChange={checked =>
                       handleSaveAutomation({ autoPredictionEnabled: checked })
                     }
                   />
@@ -233,7 +274,9 @@ export default function Settings() {
                     max={1440}
                     value={settings.predictionInterval ?? 60}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleSaveAutomation({ predictionInterval: parseInt(e.target.value) })
+                      handleSaveAutomation({
+                        predictionInterval: parseInt(e.target.value),
+                      })
                     }
                     placeholder="60"
                   />
@@ -250,12 +293,15 @@ export default function Settings() {
                     max={100}
                     value={settings.minImpactScore ?? 50}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleSaveAutomation({ minImpactScore: parseInt(e.target.value) })
+                      handleSaveAutomation({
+                        minImpactScore: parseInt(e.target.value),
+                      })
                     }
                     placeholder="50"
                   />
                   <p className="text-sm text-muted-foreground">
-                    Only generate predictions for news with impact score above this threshold
+                    Only generate predictions for news with impact score above
+                    this threshold
                   </p>
                 </div>
               </CardContent>
@@ -284,7 +330,7 @@ export default function Settings() {
                   </div>
                   <Switch
                     checked={settings.telegramEnabled ?? false}
-                    onCheckedChange={(checked) =>
+                    onCheckedChange={checked =>
                       handleSaveAutomation({ telegramEnabled: checked })
                     }
                   />
@@ -295,7 +341,9 @@ export default function Settings() {
                   <Input
                     type="text"
                     value={telegramBotToken}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTelegramBotToken(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setTelegramBotToken(e.target.value)
+                    }
                     placeholder={settings.telegramBotToken || "Enter Bot Token"}
                   />
                 </div>
@@ -305,8 +353,12 @@ export default function Settings() {
                   <Input
                     type="text"
                     value={telegramChannelId}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTelegramChannelId(e.target.value)}
-                    placeholder={settings.telegramChannelId || "Enter Channel ID"}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setTelegramChannelId(e.target.value)
+                    }
+                    placeholder={
+                      settings.telegramChannelId || "Enter Channel ID"
+                    }
                   />
                 </div>
 
@@ -319,8 +371,10 @@ export default function Settings() {
                   </div>
                   <Switch
                     checked={settings.telegramAlertOnPrediction ?? true}
-                    onCheckedChange={(checked) =>
-                      handleSaveAutomation({ telegramAlertOnPrediction: checked })
+                    onCheckedChange={checked =>
+                      handleSaveAutomation({
+                        telegramAlertOnPrediction: checked,
+                      })
                     }
                   />
                 </div>
@@ -334,7 +388,7 @@ export default function Settings() {
                   </div>
                   <Switch
                     checked={settings.telegramAlertOnNews ?? false}
-                    onCheckedChange={(checked) =>
+                    onCheckedChange={checked =>
                       handleSaveAutomation({ telegramAlertOnNews: checked })
                     }
                   />
@@ -344,7 +398,11 @@ export default function Settings() {
                   <Button onClick={handleSaveTelegram} className="focus-ring">
                     Save Telegram Settings
                   </Button>
-                  <Button variant="outline" onClick={handleTestTelegram} className="focus-ring">
+                  <Button
+                    variant="outline"
+                    onClick={handleTestTelegram}
+                    className="focus-ring"
+                  >
                     Test Connection
                   </Button>
                 </div>
@@ -369,12 +427,17 @@ export default function Settings() {
                   <Button onClick={handleScrapeNews} className="focus-ring">
                     Scrape News Now
                   </Button>
-                  <Button onClick={handleRunAnalysis} variant="outline" className="focus-ring">
+                  <Button
+                    onClick={handleRunAnalysis}
+                    variant="outline"
+                    className="focus-ring"
+                  >
                     <Play className="mr-2 h-4 w-4" /> Run Analysis
                   </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  These actions will run immediately without waiting for the configured intervals
+                  These actions will run immediately without waiting for the
+                  configured intervals
                 </p>
               </CardContent>
             </Card>
@@ -384,4 +447,3 @@ export default function Settings() {
     </div>
   );
 }
-

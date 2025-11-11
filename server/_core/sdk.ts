@@ -55,9 +55,24 @@ class SDKServer {
     return new Map(Object.entries(parsed));
   }
 
-  private getSessionSecret() {
-    const secret = ENV.cookieSecret;
-    return new TextEncoder().encode(secret);
+  // Support JWT secret rotation using a comma-separated list in JWT_SECRET
+  // First entry is used to sign new tokens; all entries are accepted for verification
+  private getSecretsRaw(): string[] {
+    const raw = ENV.cookieSecret || "";
+    return raw
+      .split(",")
+      .map(s => s.trim())
+      .filter(Boolean);
+  }
+
+  private getPrimarySecret(): Uint8Array {
+    const primary = this.getSecretsRaw()[0] || "";
+    return new TextEncoder().encode(primary);
+  }
+
+  private getAllSecrets(): Uint8Array[] {
+    const secrets = this.getSecretsRaw();
+    return secrets.map(s => new TextEncoder().encode(s));
   }
 
   /**
@@ -86,7 +101,7 @@ class SDKServer {
     const issuedAt = Date.now();
     const expiresInMs = options.expiresInMs ?? ONE_YEAR_MS;
     const expirationSeconds = Math.floor((issuedAt + expiresInMs) / 1000);
-    const secretKey = this.getSessionSecret();
+    const secretKey = this.getPrimarySecret();
 
     return new SignJWT({
       openId: payload.openId,
@@ -106,31 +121,41 @@ class SDKServer {
       return null;
     }
 
-    try {
-      const secretKey = this.getSessionSecret();
-      const { payload } = await jwtVerify(cookieValue, secretKey, {
-        algorithms: ["HS256"],
-      });
-      const { openId, appId, name } = payload as Record<string, unknown>;
-
-      if (
-        !isNonEmptyString(openId) ||
-        !isNonEmptyString(appId) ||
-        !isNonEmptyString(name)
-      ) {
-        console.warn("[Auth] Session payload missing required fields");
-        return null;
-      }
-
-      return {
-        openId,
-        appId,
-        name,
-      };
-    } catch (error) {
-      console.warn("[Auth] Session verification failed", String(error));
+    const allSecrets = this.getAllSecrets();
+    if (allSecrets.length === 0) {
+      console.warn("[Auth] No JWT_SECRET configured; cannot verify session");
       return null;
     }
+
+    // Try each configured secret to support rotation gracefully
+    for (const secretKey of allSecrets) {
+      try {
+        const { payload } = await jwtVerify(cookieValue, secretKey, {
+          algorithms: ["HS256"],
+        });
+        const { openId, appId, name } = payload as Record<string, unknown>;
+
+        if (
+          !isNonEmptyString(openId) ||
+          !isNonEmptyString(appId) ||
+          !isNonEmptyString(name)
+        ) {
+          console.warn("[Auth] Session payload missing required fields");
+          return null;
+        }
+
+        return {
+          openId,
+          appId,
+          name,
+        };
+      } catch (error) {
+        // Continue to next secret
+      }
+    }
+
+    console.warn("[Auth] Session verification failed: no matching secret (JWSSignatureVerificationFailed)");
+    return null;
   }
 
 

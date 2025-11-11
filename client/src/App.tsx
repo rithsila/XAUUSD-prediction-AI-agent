@@ -8,12 +8,15 @@ import Home from "./pages/Home";
 import ApiKeys from "./pages/ApiKeys";
 import Sentiment from "./pages/Sentiment";
 import Settings from "./pages/Settings";
+import Login from "./pages/Login";
+import { AppHeader } from "@/components/AppHeader";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path="/login" component={Login} />
       <Route path="/api-keys" component={ApiKeys} />
       <Route path="/sentiment" component={Sentiment} />
       <Route path="/settings" component={Settings} />
@@ -32,12 +35,10 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="dark"
-        switchable
-      >
+      <ThemeProvider defaultTheme="dark" switchable>
         <TooltipProvider>
           <Toaster />
+          <AppHeader />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

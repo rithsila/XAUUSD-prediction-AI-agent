@@ -51,4 +51,16 @@ export function registerAuthRoutes(app: Express) {
       res.status(500).json({ error: "Dev login failed" });
     }
   });
+
+  // Allow clearing the session cookie explicitly (useful when rotating JWT_SECRET)
+  app.post("/api/auth/logout", (req: Request, res: Response) => {
+    try {
+      const cookieOptions = getSessionCookieOptions(req);
+      res.clearCookie(COOKIE_NAME, cookieOptions);
+      res.status(204).end();
+    } catch (error) {
+      console.error("[Auth] Logout failed", error);
+      res.status(500).json({ error: "Logout failed" });
+    }
+  });
 }
